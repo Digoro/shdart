@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: 'nnb-nest',
+            name: 'shdart',
             script: './dist/main.js',
             instances: 1,
             exec_mode: 'cluster', // 실행 모드. cluster로 명시하지 않으면 기본 fork 모드가 된다.
