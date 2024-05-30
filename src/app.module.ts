@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { CorpService } from './app.service';
-import { Corp } from './corp';
+import { Corp, Finance } from './entity';
 
 @Module({
   imports: [
@@ -21,9 +21,13 @@ import { Corp } from './corp';
     }),
     TypeOrmModule.forFeature([
       Corp,
+      Finance
     ]),
+    HttpModule
   ],
-  controllers: [AppController],
+  controllers: [
+    AppController,
+  ],
   providers: [CorpService],
 })
 export class AppModule { }
