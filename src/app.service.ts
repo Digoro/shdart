@@ -111,4 +111,11 @@ export class CorpService {
       .leftJoinAndSelect('finance.corp', 'corp');
     return await paginate<Finance>(query, options);
   }
+
+  async searchCorp(dto: PaginationSearchDto): Promise<Pagination<Corp>> {
+    const options = { page: dto.page, limit: dto.limit };
+    const query = this.corpRepo.createQueryBuilder('corp')
+      .leftJoinAndSelect('corp.finances', 'finances')
+    return await paginate<Corp>(query, options);
+  }
 }

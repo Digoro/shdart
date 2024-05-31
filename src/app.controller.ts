@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { CorpService } from './app.service';
 import { PaginationSearchDto } from './dto';
-import { Finance } from './entity';
+import { Corp, Finance } from './entity';
 
 @Controller()
 export class AppController {
@@ -30,8 +30,13 @@ export class AppController {
     }
   }
 
-  @Get('/api/search')
-  async search(@Query() dto: PaginationSearchDto): Promise<Pagination<Finance>> {
+  @Get('/api/search/finance')
+  async searchFinance(@Query() dto: PaginationSearchDto): Promise<Pagination<Finance>> {
     return await this.corpService.searchFinance(dto);
+  }
+
+  @Get('/api/search/corp')
+  async searchCorp(@Query() dto: PaginationSearchDto): Promise<Pagination<Corp>> {
+    return await this.corpService.searchCorp(dto);
   }
 }
