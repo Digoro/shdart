@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pagination, paginate } from 'nestjs-typeorm-paginate';
 import { Repository } from 'typeorm';
-import { PaginationSearchDto } from './dto';
+import { CorpSearchDto, PaginationSearchDto } from './dto';
 import { Corp, Finance } from './entity';
 const JSZip = require('jszip')
 
@@ -45,7 +45,7 @@ export class CorpService {
 
   async addAllFinance() {
     const corps = await this.corpRepo.createQueryBuilder().getMany();
-    for (let i = 384; i < corps.length; i++) {
+    for (let i = 0; i < corps.length; i++) {
       await this.waitforme(300);
       const res = await this.http.get(`https://m.stock.naver.com/api/stock/${corps[i].code}/finance/annual`).toPromise();
       const arr: Finance[] = [];
@@ -105,6 +105,72 @@ export class CorpService {
     return find;
   }
 
+  async updateAllFinance() {
+    try {
+      const corps = await this.corpRepo.createQueryBuilder('corp')
+        .leftJoinAndSelect('corp.finances', 'finances')
+        .getMany();
+      for (let i = 0; i < corps.length; i++) {
+        const finances = corps[i].finances;
+        const finance1 = finances.filter(v => v.year == 202112)[0];
+        const finance2 = finances.filter(v => v.year == 202212)[0];
+        const finance3 = finances.filter(v => v.year == 202312)[0];
+        if (finance1 && finance2 && finance3) {
+          const fullRevenue1 = finance1.fullRevenue;
+          const fullRevenue2 = finance2.fullRevenue;
+          const fullRevenue3 = finance3.fullRevenue;
+          if (fullRevenue1 && fullRevenue2) {
+            finance2.revenuePerYearIncreaseRatio = +((fullRevenue2 - Math.abs(fullRevenue1)) / Math.abs(fullRevenue1) * 100).toFixed(2);
+            if (fullRevenue3) {
+              finance3.revenuePerYearIncreaseRatio = +((finance2.revenuePerYearIncreaseRatio + +((fullRevenue3 - Math.abs(fullRevenue2)) / Math.abs(fullRevenue2) * 100).toFixed(2)) / 2).toFixed(2);
+            }
+          }
+
+          const netProfit1 = finance1.netIncome;
+          const netProfit2 = finance2.netIncome;
+          const netProfit3 = finance3.netIncome;
+          if (netProfit1 && netProfit2) {
+            finance2.netProfitPerYearIncreaseRatio = +((netProfit2 - Math.abs(netProfit1)) / Math.abs(netProfit1) * 100).toFixed(2);
+            finance2.netProfitIncreaseRatio = +((netProfit2 - Math.abs(netProfit1)) / Math.abs(netProfit1) * 100).toFixed(2);
+            finance2.continuousIncreaseNetProfit = netProfit1 < netProfit2 ? 1 : 0;
+            if (netProfit3) {
+              finance3.netProfitPerYearIncreaseRatio = +((finance2.netProfitPerYearIncreaseRatio + +((netProfit3 - Math.abs(netProfit2)) / Math.abs(netProfit2) * 100).toFixed(2)) / 2).toFixed(2);
+              finance3.netProfitIncreaseRatio = +((netProfit3 - Math.abs(netProfit2)) / Math.abs(netProfit2) * 100).toFixed(2);
+              finance3.continuousIncreaseNetProfit = netProfit2 < netProfit3 ? finance2.continuousIncreaseNetProfit + 1 : finance2.continuousIncreaseNetProfit;
+            }
+          }
+
+          const operatingProfit1 = finance1.operatingProfit;
+          const operatingProfit2 = finance2.operatingProfit;
+          const operatingProfit3 = finance3.operatingProfit;
+          if (operatingProfit1 && operatingProfit2) {
+            finance2.operatingProfitIncreaseRatio = +((operatingProfit2 - Math.abs(operatingProfit1)) / Math.abs(operatingProfit1) * 100).toFixed(2);
+            finance2.continuousIncreaseOperatingProfit = operatingProfit1 < operatingProfit2 ? 1 : 0;
+            if (operatingProfit3) {
+              finance3.operatingProfitIncreaseRatio = +((operatingProfit3 - Math.abs(operatingProfit2)) / Math.abs(operatingProfit2) * 100).toFixed(2);
+              finance3.continuousIncreaseOperatingProfit = operatingProfit2 < operatingProfit3 ? finance2.continuousIncreaseOperatingProfit + 1 : finance2.continuousIncreaseOperatingProfit;
+            }
+          }
+
+          const dividendPerShare1 = finance1.dividendPerShare;
+          const dividendPerShare2 = finance2.dividendPerShare;
+          const dividendPerShare3 = finance3.dividendPerShare;
+          if (dividendPerShare1 && dividendPerShare1) {
+            finance2.continuousincreaseDividends = dividendPerShare1 < operatingProfit2 ? 1 : 0;
+            if (dividendPerShare3) {
+              finance3.continuousincreaseDividends = dividendPerShare2 < dividendPerShare3 ? finance2.continuousincreaseDividends + 1 : finance2.continuousincreaseDividends;
+            }
+          }
+          await this.financeRepo.update(finance2.id, finance2);
+          await this.financeRepo.update(finance3.id, finance3);
+        }
+      }
+    } catch (e) {
+      console.log(e)
+    }
+    return;
+  }
+
   async searchFinance(dto: PaginationSearchDto): Promise<Pagination<Finance>> {
     const options = { page: dto.page, limit: dto.limit };
     const query = this.financeRepo.createQueryBuilder('finance')
@@ -112,10 +178,41 @@ export class CorpService {
     return await paginate<Finance>(query, options);
   }
 
-  async searchCorp(dto: PaginationSearchDto): Promise<Pagination<Corp>> {
+  async searchCorp(dto: CorpSearchDto): Promise<Pagination<Corp>> {
     const options = { page: dto.page, limit: dto.limit };
     const query = this.corpRepo.createQueryBuilder('corp')
       .leftJoinAndSelect('corp.finances', 'finances')
+      .where('finances.year = :year', { year: 202312 })
+    if (dto.revenuePerYearIncreaseRatio) {
+      query.andWhere('finances.revenuePerYearIncreaseRatio >:revenuePerYearIncreaseRatio', { revenuePerYearIncreaseRatio: dto.revenuePerYearIncreaseRatio })
+    }
+    if (dto.netProfitPerYearIncreaseRatio) {
+      query.andWhere('finances.netProfitPerYearIncreaseRatio >:netProfitPerYearIncreaseRatio', { netProfitPerYearIncreaseRatio: dto.netProfitPerYearIncreaseRatio })
+    }
+    if (dto.per) {
+      query.andWhere('finances.per <:per', { per: dto.per })
+    }
+    if (dto.netProfitIncreaseRatio) {
+      query.andWhere('finances.netProfitIncreaseRatio >:netProfitIncreaseRatio', { netProfitIncreaseRatio: dto.netProfitIncreaseRatio })
+    }
+    if (dto.continuousIncreaseNetProfit) {
+      query.andWhere('finances.continuousIncreaseNetProfit >:continuousIncreaseNetProfit', { continuousIncreaseNetProfit: dto.continuousIncreaseNetProfit })
+    }
+    if (dto.roe) {
+      query.andWhere('finances.roe >:roe', { roe: dto.roe })
+    }
+    if (dto.continuousIncreaseOperatingProfit) {
+      query.andWhere('finances.continuousIncreaseOperatingProfit >:continuousIncreaseOperatingProfit', { continuousIncreaseOperatingProfit: dto.continuousIncreaseOperatingProfit })
+    }
+    if (dto.operatingProfitIncreaseRatio) {
+      query.andWhere('finances.operatingProfitIncreaseRatio >:operatingProfitIncreaseRatio', { operatingProfitIncreaseRatio: dto.operatingProfitIncreaseRatio })
+    }
+    if (dto.pbr) {
+      query.andWhere('finances.pbr <:pbr', { pbr: dto.pbr })
+    }
+    if (dto.continuousincreaseDividends) {
+      query.andWhere('finances.continuousincreaseDividends >:continuousincreaseDividends', { continuousincreaseDividends: dto.continuousincreaseDividends })
+    }
     return await paginate<Corp>(query, options);
   }
 }

@@ -75,4 +75,25 @@ export class Finance extends BasicEntity {
 
     @Column({ nullable: true, type: 'double', comment: '주당배당금' })
     dividendPerShare: number;
+
+    @Column({ nullable: true, type: 'double', comment: '연평균 매출액 증감률' })
+    revenuePerYearIncreaseRatio: number;
+
+    @Column({ nullable: true, type: 'double', comment: '연평균 순이익 증감률' })
+    netProfitPerYearIncreaseRatio: number;
+
+    @Column({ nullable: true, type: 'double', comment: '영업이익 증감률' })
+    operatingProfitIncreaseRatio: number;
+
+    @Column({ nullable: true, type: 'double', comment: '순이익 증감률' })
+    netProfitIncreaseRatio: number;
+
+    @Column({ nullable: true, type: 'double', comment: '순이익 연속증가' })
+    continuousIncreaseNetProfit: number;
+
+    @Column({ nullable: true, type: 'double', comment: '영업이익 연속증가' })
+    continuousIncreaseOperatingProfit: number;
+
+    @Column({ nullable: true, type: 'double', comment: '배당 연속증가' })
+    continuousincreaseDividends: number;
 }
