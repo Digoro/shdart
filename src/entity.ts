@@ -25,6 +25,9 @@ export class Corp extends BasicEntity {
     name: string;
 
     @Column()
+    logo: string;
+
+    @Column()
     market: string;
 
     @Column()
