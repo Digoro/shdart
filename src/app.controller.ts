@@ -54,6 +54,11 @@ export class AppController {
     return await this.corpService.summaryCorp(dto.corpName);
   }
 
+  @Get('/api/summary/market')
+  async summaryMarket(): Promise<{ response: string }> {
+    return await this.corpService.summaryMarket();
+  }
+
   @Get('/api/corp/:code')
   async getCorp(@Param('code') code: string): Promise<Corp> {
     return await this.corpService.getCorp(code);

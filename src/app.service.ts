@@ -231,6 +231,24 @@ export class CorpService {
     }
   }
 
+  async summaryMarket(): Promise<{ response: string }> {
+    try {
+      const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      const prompts = [
+        `주식 초보에게 설명한다고 했을 때, 요즘 코스닥과 코스피 시장의 전반적인 상황을 10줄 이내로 짧게 답변만 적어서 요약. 답변 형태는 서술식 구어체이고 특수문자를 사용하지 않고 일반 글자로만. '응'이라고 말하지 말아줘.`,
+        `주식 초보에게 설명한다고 했을 때, 요즘 코스닥과 코스피 시장의 주요 업종 및 종목 이슈의 전반적인 상황을 10줄 이내로 짧게 답변만 적어서 요약. 답변 형태는 서술식 구어체이고 특수문자를 사용하지 않고 일반 글자로만. '응'이라고 말하지 말아줘.`
+      ]
+      const prompt = prompts[Math.floor(Math.random() * (2 - 1 + 1))]
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      return { response: text };
+    } catch (e) {
+      throw new InternalServerErrorException('주식 시장 요약 오류', e.message)
+    }
+  }
+
   async getCorp(code: string): Promise<Corp> {
     return await this.corpRepo.createQueryBuilder('corp')
       .leftJoinAndSelect('corp.finances', 'finances')
