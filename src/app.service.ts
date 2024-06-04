@@ -1,5 +1,6 @@
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const xlsx = require('xlsx');
-import { HttpService, Injectable } from '@nestjs/common';
+import { HttpService, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Pagination, paginate } from 'nestjs-typeorm-paginate';
@@ -184,35 +185,56 @@ export class CorpService {
       .leftJoinAndSelect('corp.finances', 'finances')
       .where('finances.year = :year', { year: 202312 })
     if (dto.revenuePerYearIncreaseRatio) {
-      query.andWhere('finances.revenuePerYearIncreaseRatio >:revenuePerYearIncreaseRatio', { revenuePerYearIncreaseRatio: dto.revenuePerYearIncreaseRatio })
+      query.andWhere('finances.revenuePerYearIncreaseRatio >= :revenuePerYearIncreaseRatio', { revenuePerYearIncreaseRatio: dto.revenuePerYearIncreaseRatio })
     }
     if (dto.netProfitPerYearIncreaseRatio) {
-      query.andWhere('finances.netProfitPerYearIncreaseRatio >:netProfitPerYearIncreaseRatio', { netProfitPerYearIncreaseRatio: dto.netProfitPerYearIncreaseRatio })
+      query.andWhere('finances.netProfitPerYearIncreaseRatio >= :netProfitPerYearIncreaseRatio', { netProfitPerYearIncreaseRatio: dto.netProfitPerYearIncreaseRatio })
     }
     if (dto.per) {
-      query.andWhere('finances.per <:per', { per: dto.per })
+      query.andWhere('finances.per <= :per', { per: dto.per })
     }
     if (dto.netProfitIncreaseRatio) {
-      query.andWhere('finances.netProfitIncreaseRatio >:netProfitIncreaseRatio', { netProfitIncreaseRatio: dto.netProfitIncreaseRatio })
+      query.andWhere('finances.netProfitIncreaseRatio >= :netProfitIncreaseRatio', { netProfitIncreaseRatio: dto.netProfitIncreaseRatio })
     }
     if (dto.continuousIncreaseNetProfit) {
-      query.andWhere('finances.continuousIncreaseNetProfit >:continuousIncreaseNetProfit', { continuousIncreaseNetProfit: dto.continuousIncreaseNetProfit })
+      query.andWhere('finances.continuousIncreaseNetProfit >= :continuousIncreaseNetProfit', { continuousIncreaseNetProfit: dto.continuousIncreaseNetProfit })
     }
     if (dto.roe) {
-      query.andWhere('finances.roe >:roe', { roe: dto.roe })
+      query.andWhere('finances.roe >= :roe', { roe: dto.roe })
     }
     if (dto.continuousIncreaseOperatingProfit) {
-      query.andWhere('finances.continuousIncreaseOperatingProfit >:continuousIncreaseOperatingProfit', { continuousIncreaseOperatingProfit: dto.continuousIncreaseOperatingProfit })
+      query.andWhere('finances.continuousIncreaseOperatingProfit >= :continuousIncreaseOperatingProfit', { continuousIncreaseOperatingProfit: dto.continuousIncreaseOperatingProfit })
     }
     if (dto.operatingProfitIncreaseRatio) {
-      query.andWhere('finances.operatingProfitIncreaseRatio >:operatingProfitIncreaseRatio', { operatingProfitIncreaseRatio: dto.operatingProfitIncreaseRatio })
+      query.andWhere('finances.operatingProfitIncreaseRatio >= :operatingProfitIncreaseRatio', { operatingProfitIncreaseRatio: dto.operatingProfitIncreaseRatio })
     }
     if (dto.pbr) {
-      query.andWhere('finances.pbr <:pbr', { pbr: dto.pbr })
+      query.andWhere('finances.pbr <= :pbr', { pbr: dto.pbr })
     }
     if (dto.continuousincreaseDividends) {
-      query.andWhere('finances.continuousincreaseDividends >:continuousincreaseDividends', { continuousincreaseDividends: dto.continuousincreaseDividends })
+      query.andWhere('finances.continuousincreaseDividends >= :continuousincreaseDividends', { continuousincreaseDividends: dto.continuousincreaseDividends })
     }
     return await paginate<Corp>(query, options);
+  }
+
+  async summaryCorp(corpName: string): Promise<{ response: string }> {
+    try {
+      const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      const prompt = `주식을 잘 모르는 초보에게 설명한다고 했을 때, 한국 상장 기업인 "${corpName}" 기업 분석을 답변만 적어서 요약해줘. 답변 형식은 마크다운 문법이나 문자 없이 일반 글자로만 답변 해주고 구어체로 답변 해줘.`
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      return { response: text };
+    } catch (e) {
+      throw new InternalServerErrorException('주식 시장 요약 오류', e.message)
+    }
+  }
+
+  async getCorp(code: string): Promise<Corp> {
+    return await this.corpRepo.createQueryBuilder('corp')
+      .leftJoinAndSelect('corp.finances', 'finances')
+      .where('corp.code = :code', { code })
+      .getOne()
   }
 }

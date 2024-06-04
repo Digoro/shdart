@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Query, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { CorpService } from './app.service';
@@ -47,5 +47,15 @@ export class AppController {
   @Get('/api/search/corp')
   async searchCorp(@Query() dto: CorpSearchDto): Promise<Pagination<Corp>> {
     return await this.corpService.searchCorp(dto);
+  }
+
+  @Get('/api/summary/corp')
+  async summaryCorp(@Query() dto: { corpName: string }): Promise<{ response: string }> {
+    return await this.corpService.summaryCorp(dto.corpName);
+  }
+
+  @Get('/api/corp/:code')
+  async getCorp(@Param('code') code: string): Promise<Corp> {
+    return await this.corpService.getCorp(code);
   }
 }
