@@ -179,8 +179,14 @@ export class CorpService {
     return await paginate<Finance>(query, options);
   }
 
-  async searchCorp(dto: CorpSearchDto): Promise<Pagination<Corp>> {
-    const options = { page: dto.page, limit: dto.limit };
+  async findCorp(term: string): Promise<Corp[]> {
+    return await this.corpRepo.createQueryBuilder('corp')
+      .where(`corp.name like "%${term}%"`)
+      .orWhere(`corp.code like "%${term}%"`)
+      .getMany();
+  }
+
+  async searchCorp(dto: CorpSearchDto): Promise<Corp[]> {
     const query = this.corpRepo.createQueryBuilder('corp')
       .leftJoinAndSelect('corp.finances', 'finances')
       .where('finances.year = :year', { year: 202312 })
@@ -214,7 +220,7 @@ export class CorpService {
     if (dto.continuousincreaseDividends) {
       query.andWhere('finances.continuousincreaseDividends >= :continuousincreaseDividends', { continuousincreaseDividends: dto.continuousincreaseDividends })
     }
-    return await paginate<Corp>(query, options);
+    return await query.getMany();
   }
 
   async summaryCorp(corpName: string): Promise<{ response: string }> {

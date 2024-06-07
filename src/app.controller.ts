@@ -45,8 +45,13 @@ export class AppController {
   }
 
   @Get('/api/search/corp')
-  async searchCorp(@Query() dto: CorpSearchDto): Promise<Pagination<Corp>> {
+  async searchCorp(@Query() dto: CorpSearchDto): Promise<Corp[]> {
     return await this.corpService.searchCorp(dto);
+  }
+
+  @Get('/api/find/corp')
+  async findCorp(@Query() dto: { term: string }): Promise<Corp[]> {
+    return await this.corpService.findCorp(dto.term);
   }
 
   @Get('/api/summary/corp')
