@@ -2,6 +2,7 @@ import { HttpModule, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
+import { AppGateway } from './app.gateway';
 import { CorpService } from './app.service';
 import { Corp, Finance } from './entity';
 
@@ -26,8 +27,11 @@ import { Corp, Finance } from './entity';
     HttpModule
   ],
   controllers: [
-    AppController,
+    AppController
   ],
-  providers: [CorpService],
+  providers: [
+    CorpService,
+    AppGateway
+  ],
 })
 export class AppModule { }

@@ -5,14 +5,14 @@ import { CorpService } from './app.service';
 import { CorpSearchDto, PaginationSearchDto } from './dto';
 import { Corp, Finance } from './entity';
 
-@Controller()
+@Controller('/api')
 export class AppController {
   constructor(
     private corpService: CorpService,
     private config: ConfigService
   ) { }
 
-  @Post('/api/corp')
+  @Post('/corp')
   async addAllCorp(@Body() data: any, @Res() res) {
     if (data.accessKey == this.config.get('ACCESS_KEY')) {
       await this.corpService.addAllCorp();
@@ -21,7 +21,7 @@ export class AppController {
     }
   }
 
-  @Post('/api/finance')
+  @Post('/finance')
   async addAllFinance(@Body() data: any, @Res() res) {
     if (data.accessKey == this.config.get('ACCESS_KEY')) {
       await this.corpService.addAllFinance();
@@ -30,7 +30,7 @@ export class AppController {
     }
   }
 
-  @Put('/api/finance')
+  @Put('/finance')
   async updatAllFinance(@Body() data: any) {
     if (data.accessKey == this.config.get('ACCESS_KEY')) {
       await this.corpService.updateAllFinance();
@@ -39,33 +39,23 @@ export class AppController {
     }
   }
 
-  @Get('/api/search/finance')
+  @Get('/search/finance')
   async searchFinance(@Query() dto: PaginationSearchDto): Promise<Pagination<Finance>> {
     return await this.corpService.searchFinance(dto);
   }
 
-  @Get('/api/search/corp')
+  @Get('/search/corp')
   async searchCorp(@Query() dto: CorpSearchDto): Promise<Corp[]> {
     return await this.corpService.searchCorp(dto);
   }
 
-  @Get('/api/find/corp')
+  @Get('/find/corp')
   async findCorp(@Query() dto: { term: string }): Promise<Corp[]> {
     return await this.corpService.findCorp(dto.term);
   }
 
-  @Get('/api/summary/corp')
-  async summaryCorp(@Query() dto: { corpName: string }): Promise<{ response: string }> {
-    return await this.corpService.summaryCorp(dto.corpName);
-  }
-
-  @Get('/api/summary/market')
-  async summaryMarket(): Promise<{ response: string }> {
-    return await this.corpService.summaryMarket();
-  }
-
-  @Get('/api/corp/:code')
+  @Get('/corp/:code')
   async getCorp(@Param('code') code: string): Promise<Corp> {
-    return await this.corpService.getCorp(code);
+    return await this.corpService.getCorpByCode(code);
   }
 }
