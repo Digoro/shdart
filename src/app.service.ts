@@ -250,18 +250,18 @@ export class CorpService {
       const corp = await this.getCorpByName(corpName);
       const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-      // const prompt = `주식을 잘 모르는 초보에게 설명한다고 했을 때, 한국 상장 기업인 "${corpName}" 기업 분석을 답변만 적어서 요약해줘. 답변 형식은 마크다운 문법이나 문자 없이 일반 글자로만 답변 해주고 구어체 존댓말로 답변 해줘. 답변에 이모지도 2개 미만으로 섞어줘.`
-      const prompt = `주식을 잘 모르는 초보에게 설명한다고 했을 때, 한국 상장 기업인 "${corpName}" 기업 분석을 답변만 적어서 요약해줘.
-기업의 2021~2023년 재무재표는 다음과 같아.
-${JSON.stringify(corp.finances
-        .filter(v => v.year == 202412).map(v => {
-          delete v.id;
-          delete v.createdAt;
-          delete v.updatedAt;
-          return v;
-        }))}
-기업의 재무재표 숫자를 기반으로 성장성, 안정성, 수익성을 나눠서 분석하여 요약해주고, 앞으로 투자할만한지도 알려줘.
-답변 형식은 마크다운 문법이나 문자 없이 일반 글자로만 답변 해주고 구어체 존댓말로 답변 해줘. 답변에 이모지도 2개 미만으로 섞어줘.`
+      const prompt = `주식을 잘 모르는 초보에게 설명한다고 했을 때, 한국 상장 기업인 "${corpName}" 기업 분석을 답변만 적어서 요약해줘. 답변 형식은 마크다운 문법이나 문자 없이 일반 글자로만 답변 해주고 구어체 존댓말로 답변 해줘. 답변에 이모지도 2개 미만으로 섞어줘.`
+      //       const prompt = `주식을 잘 모르는 초보에게 설명한다고 했을 때, 한국 상장 기업인 "${corpName}" 기업 분석을 답변만 적어서 요약해줘.
+      // 기업의 2021~2023년 재무재표는 다음과 같아.
+      // ${JSON.stringify(corp.finances
+      //         .filter(v => v.year == 202412).map(v => {
+      //           delete v.id;
+      //           delete v.createdAt;
+      //           delete v.updatedAt;
+      //           return v;
+      //         }))}
+      // 기업의 재무재표 숫자를 기반으로 성장성, 안정성, 수익성을 나눠서 분석하여 요약해주고, 앞으로 투자할만한지도 알려줘.
+      // 답변 형식은 마크다운 문법이나 문자 없이 일반 글자로만 답변 해주고 구어체 존댓말로 답변 해줘. 답변에 이모지도 2개 미만으로 섞어줘.`
       const result = await model.generateContentStream([prompt]);
       return result;
     } catch (e) {
