@@ -1,19 +1,13 @@
 # 서비스
 
-서비스 바로가기 👉👉 [**https://m.site.naver.com/1och2**](https://m.site.naver.com/1och2)
+### 서비스 링크 👉👉 [**https://m.site.naver.com/1och2**](https://m.site.naver.com/1och2)
 
 - 국내 시장 현황에 대해 Stock AI가 요약해줍니다.
-    
-    ![스크린샷 2024-06-12 오후 1.54.36.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/eb69efbc-204e-4fc7-8098-b5d75cbb9a16/37a22ff3-71dc-474c-ad15-cc8c05d7fc2a/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2024-06-12_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_1.54.36.png)
-    
-- 주식 모아보기를 통해 관심사 별 종목을 필터링 합니다
-    
-    ![스크린샷 2024-06-12 오후 1.54.40.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/eb69efbc-204e-4fc7-8098-b5d75cbb9a16/7aa8f712-06eb-470e-89b0-5c2f6e72dad2/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2024-06-12_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_1.54.40.png)
-    
+ <img src="/screenshot/screenshot001.png" width="320" />
+- 주식 모아보기를 통해 관심사 별 종목을 필터링 합니다.
+ <img src="/screenshot/screenshot002.png" width="320" />
 - 각 종목 별 개요와 재무정보(성장성, 안정성, 수익성) 요약을 제공합니다.
-    
-    ![스크린샷 2024-06-12 오후 1.56.07.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/eb69efbc-204e-4fc7-8098-b5d75cbb9a16/700b0de9-26b3-4f12-86ae-4303d41275ba/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2024-06-12_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_1.56.07.png)
-    
+ <img src="/screenshot/screenshot003.png" width="320" />
 
 # 개요
 
@@ -46,4 +40,8 @@
 - 프론트엔드: Angular, Typescript
 - AI API: Gemini API, gemini-1.5-pro
 
-서비스 바로가기 👉👉 [**https://m.site.naver.com/1och2**](https://m.site.naver.com/1och2)
+
+------------
+
+
+### 서비스 링크 👉👉 [**https://m.site.naver.com/1och2**](https://m.site.naver.com/1och2)
