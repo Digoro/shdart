@@ -79,6 +79,15 @@ export class Finance extends BasicEntity {
     @Column({ nullable: true, type: 'double', comment: '주당배당금' })
     dividendPerShare: number;
 
+    @Column({ nullable: true, type: 'double', comment: '부채비율' })
+    debtToEquityRatio: number;
+
+    @Column({ nullable: true, type: 'double', comment: '당좌비율' })
+    quickRatio: number;
+
+    @Column({ nullable: true, type: 'double', comment: '유보율' })
+    reserveRatio: number;
+
     @Column({ nullable: true, type: 'double', comment: '연평균 매출액 증감률' })
     revenuePerYearIncreaseRatio: number;
 
