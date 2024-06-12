@@ -53,11 +53,11 @@
 - 구현 모델은 ‘gemini-1.5-pro’을 사용하며 코드 및 텍스트 생성, 텍스트 편집, 문제 해결, 데이터 추출 및 생성과 같은 복잡한 추론 작업이 가능합니다.
 
 # 구현 기술
-- 배포 및 호스팅: AWS EC2
-- 데이터베이스: AWS RDS, Mysql
-- 백엔드: NestJS, Typescript
-- 프론트엔드: Angular, Typescript
-- AI API: Gemini API, gemini-1.5-pro
+- 배포 및 호스팅: AWS EC2 ubuntu 24.04
+- 데이터베이스: AWS RDS, Mysql 10.11.6
+- 백엔드: NestJS 7.5.1, Typescript 4.0.5
+- 프론트엔드: Angular 18.0.2, Typescript 5.4.5, ngx-socket-io 4.7.0
+- AI API: Gemini API gemini-1.5-pro
 
 # 서비스 바로가기
 - 서비스 링크 💁🏻‍♀️ [**https://m.site.naver.com/1och2**](https://m.site.naver.com/1och2)
