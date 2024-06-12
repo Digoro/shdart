@@ -49,7 +49,7 @@
 
 # AI 활용
 - Google Gemini API를 활용하여 Stock AI 기능을 구현합니다.
-    - [https://ai.google.dev/gemini-api/docs](https://ai.google.dev/gemini-api/docs?hl=ko)
+    - [https://ai.google.dev/gemini-api](https://ai.google.dev/gemini-api)
 - 구현 모델은 ‘gemini-1.5-pro’을 사용하며 코드 및 텍스트 생성, 텍스트 편집, 문제 해결, 데이터 추출 및 생성과 같은 복잡한 추론 작업이 가능합니다.
 
 # 구현 기술
