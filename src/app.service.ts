@@ -242,18 +242,25 @@ export class CorpService {
   }
 
   async summaryMarket() {
-    const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-    const prompts = [
-      `주식 초보에게 설명한다고 했을 때, 요즘 국내 주가 시장과 주요 업종 및 종목 이슈의 상황을 20줄 정도로 답변만 적어서 요약해줘.
-      '응'이라고 말하지 말아줘. 답변 형식은 마크다운 문법 해주는데 '#'과 같은 제목 문법은 빼줘. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어줘.`
-    ];
-    const prompt = prompts[Math.floor(Math.random() * (2 - 1 + 1))];
-    const result = await model.generateContentStream([prompt]);
-    return result;
+    console.count('summaryMarket fun call!')
+    try {
+      const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      const prompts = [
+        `주식 초보에게 설명한다고 했을 때, 요즘 국내 주가 시장과 주요 업종 및 종목 이슈의 상황을 20줄 정도로 답변만 적어서 요약해줘.
+      '응'이라고 말하지 말아줘. 답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼줘. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어줘.`
+      ];
+      const prompt = prompts[Math.floor(Math.random() * (2 - 1 + 1))];
+      const result = await model.generateContentStream([prompt]);
+      return result;
+    } catch (e) {
+      console.log(e.message)
+      throw new InternalServerErrorException('주식 시장 요약 오류', e.message)
+    }
   }
 
   async summaryCorp(corpName: string) {
+    console.count('summaryMarket fun call!')
     try {
       const corp = await this.getCorpByName(corpName);
       const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
@@ -268,11 +275,12 @@ export class CorpService {
           return v;
         }))}
       기업의 재무재표 숫자를 기반으로 성장성, 안정성, 수익성을 나눠서 분석하여 요약해주고, 앞으로 투자할만한지도 알려줘.
-      답변 형식은 마크다운 문법 해주는데 '#'과 같은 제목 문법은 빼줘. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어줘.`
+      답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼줘. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어줘.`
       const result = await model.generateContentStream([prompt]);
       return result;
     } catch (e) {
-      throw new InternalServerErrorException('주식 시장 요약 오류', e.message)
+      console.log(e.message)
+      throw new InternalServerErrorException('주식 종목 분석 오류', e.message)
     }
   }
 }

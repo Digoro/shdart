@@ -12,19 +12,36 @@ export class AppGateway {
 
   @SubscribeMessage('getSummaryMarket')
   async getSummaryMarket(socket: Socket) {
-    const result = await this.corpService.summaryMarket();
-    for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      await this.server.to(socket.id).emit('emitSummaryMarket', chunkText);
-    }
+    this.retry(10, async () => {
+      const result = await this.corpService.summaryMarket();
+      for await (const chunk of result.stream) {
+        const chunkText = chunk.text();
+        await this.server.to(socket.id).emit('emitSummaryMarket', chunkText);
+      }
+    })
   }
 
   @SubscribeMessage('getSummaryCorp')
   async getSummaryCorp(socket: Socket, data: { corpName: string }) {
-    const result = await this.corpService.summaryCorp(data.corpName);
-    for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      await this.server.to(socket.id).emit('emitSummaryCorp', chunkText);
+    this.retry(10, async () => {
+      const result = await this.corpService.summaryCorp(data.corpName);
+      for await (const chunk of result.stream) {
+        const chunkText = chunk.text();
+        await this.server.to(socket.id).emit('emitSummaryCorp', chunkText);
+      }
+    })
+  }
+
+  async retry(count: number, call: () => {}, tryCount: number = 1) {
+    try {
+      await call();
+    } catch (e) {
+      if (tryCount <= count) {
+        tryCount += 1;
+        setTimeout(async () => {
+          await this.retry(count, call, tryCount);
+        }, 5000);
+      }
     }
   }
 }
