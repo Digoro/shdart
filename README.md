@@ -53,11 +53,13 @@
 - 구현 모델은 ‘gemini-1.5-pro’을 사용하며 코드 및 텍스트 생성, 텍스트 편집, 문제 해결, 데이터 추출 및 생성과 같은 복잡한 추론 작업이 가능합니다.
 
 # 구현 기술
-- 배포 및 호스팅: AWS EC2 ubuntu 24.04
+- 배포 및 호스팅: Docker, AWS ECS / Fargate / EC2 ubuntu 24.04
 - 데이터베이스: AWS RDS, Mysql 10.11.6
 - 백엔드: NestJS 7.5.1, Typescript 4.0.5
 - 프론트엔드: Angular 18.0.2, Typescript 5.4.5, ngx-socket-io 4.7.0
 - AI API: Gemini API gemini-1.5-pro
+- 도커라이징 및 AWS 프로비저닝 내용 정리:  [**블로그 바로가기**](https://medium.com/frontend-developers/aws-%ED%94%84%EB%A1%9C%EB%B9%84%EC%A0%80%EB%8B%9D%EC%9D%84-%ED%86%B5%ED%95%9C-%EC%A6%9D%EA%B6%8C-%EC%84%9C%EB%B9%84%EC%8A%A4-%EA%B5%AC%EC%B6%95-01-c5160c4a5c55)
+
 
 # 서비스 바로가기
 - 서비스 링크 💁🏻‍♀️ [**https://m.site.naver.com/1och2**](https://m.site.naver.com/1och2)
