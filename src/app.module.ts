@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppGateway } from './app.gateway';
 import { CorpService } from './app.service';
 import { Corp, Finance } from './entity';
+import { HealthCheckController } from "./health-check.controller";
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { Corp, Finance } from './entity';
     HttpModule
   ],
   controllers: [
-    AppController
+    AppController,
+    HealthCheckController
   ],
   providers: [
     CorpService,
