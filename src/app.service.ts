@@ -247,8 +247,8 @@ export class CorpService {
       const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
       const prompts = [
-        `주식 초보에게 설명한다고 했을 때, 요즘 국내 주가 시장과 주요 업종 및 종목 이슈의 상황을 20줄 정도로 답변만 적어서 요약해줘.
-      '응'이라고 말하지 말아줘. 답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼줘. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어줘.`
+        `주식 초보에게 설명한다고 했을 때, 요즘 국내 주가 시장과 주요 업종 및 종목 이슈의 상황을 20줄 정도로 답변만 적어서 요약해주세요.
+      '응'이라고 말하지 말아주세요. 답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼주세요. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어주세요.`
       ];
       const prompt = prompts[Math.floor(Math.random() * (2 - 1 + 1))];
       const result = await model.generateContentStream([prompt]);
@@ -265,8 +265,8 @@ export class CorpService {
       const corp = await this.getCorpByName(corpName);
       const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-      const prompt = `주식을 잘 모르는 초보에게 설명한다고 했을 때, 한국 상장 기업인 "${corpName}" 기업에 대해 짧게 소개해주고 재무 분석을 해서 답변만 적어서 요약해줘.
-      기업의 2021~2023년 재무재표는 다음과 같아.
+      const prompt = `주식을 잘 모르는 초보에게 설명한다고 했을 때, 한국 상장 기업인 "${corpName}" 기업에 대해 짧게 소개해주고 재무 분석을 해서 답변만 적어서 요약해주세요.
+      기업의 2021~2023년 재무재표는 다음과 같아요.
       ${JSON.stringify(corp.finances
         .filter(v => v.year != 202412).map(v => {
           delete v.id;
@@ -274,8 +274,8 @@ export class CorpService {
           delete v.updatedAt;
           return v;
         }))}
-      기업의 재무재표 숫자를 기반으로 성장성, 안정성, 수익성을 나눠서 분석하여 요약해주고, 앞으로 투자할만한지도 알려줘.
-      답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼줘. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어줘.`
+      기업의 재무재표 숫자를 기반으로 성장성, 안정성, 수익성을 나눠서 분석하여 요약해주고, 앞으로 투자할만한지도 알려주세요.
+      답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼주세요. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어주세요.`
       const result = await model.generateContentStream([prompt]);
       return result;
     } catch (e) {
@@ -290,8 +290,8 @@ export class CorpService {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
       dto.messageList.unshift({
         role: 'user', parts: [{
-          text: `앞으로 질문은 주식, 증권, 종목 등과 관련된 내용만 답변해야해. 주식을 잘 모르는 초보에게 설명한다고 한다고 생각해줘.
-        답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼줘. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어줘.` }]
+          text: `앞으로 질문은 주식, 증권, 종목 등과 관련된 내용만 답변해야해요. 주식을 잘 모르는 초보에게 설명한다고 한다고 생각해주세요.
+        답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼주세요. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어주세요.` }]
       })
       const lastMessage = dto.messageList[dto.messageList.length - 1];
       dto.messageList.pop();
@@ -313,8 +313,8 @@ export class CorpService {
       const chat = model.startChat({
         history: dto.messageList,
       });
-      const result = await chat.sendMessage(`추천할만한 관련된 질문 3개를 알려줘. 답변 형태는 무조건 json array format으로 해주는데 배열 string만 답변해줘.
-        예를 들어 ['질문 1', '질문 2', '질문 3'] 이런 형태야.`);
+      const result = await chat.sendMessage(`추천할만한 관련된 질문 3개를 알려주세요. 답변 형태는 무조건 json array format으로 해주는데 배열 string만 답변해주세요.
+        예를 들어 ['질문 1', '질문 2', '질문 3'] 이런 형태에요.`);
       const response = await result.response;
       return response.text();
     } catch (e) {
