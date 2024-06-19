@@ -68,4 +68,14 @@ export class AppController {
       throw new InternalServerErrorException('채팅 답변 오류', e.message)
     }
   }
+
+  @Post('/chat/relation_questions')
+  async getRelationQuestions(@Body() data: any) {
+    try {
+      const answer = await this.corpService.getRealtionQuestions(data);
+      return { answer }
+    } catch (e) {
+      throw new InternalServerErrorException('채팅 답변 오류', e.message)
+    }
+  }
 }

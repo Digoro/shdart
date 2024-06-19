@@ -290,24 +290,33 @@ export class CorpService {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
       dto.messageList.unshift({
         role: 'user', parts: [{
-          text: `앞으로 질문은 주식, 증권, 종목 등과 관련된 내용만 답변해야해.
+          text: `앞으로 질문은 주식, 증권, 종목 등과 관련된 내용만 답변해야해. 주식을 잘 모르는 초보에게 설명한다고 한다고 생각해줘.
         답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼줘. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어줘.` }]
       })
-      if (dto.messageList.length > 1) {
-        const lastMessage = dto.messageList[dto.messageList.length - 1];
-        dto.messageList.pop();
-        const chat = model.startChat({
-          history: dto.messageList,
-        });
-        const result = await chat.sendMessage(lastMessage.parts[0].text);
-        const response = await result.response;
-        return response.text();
-      } else {
-        const prompt = dto.messageList[0].parts[0].text;
-        const result = await model.generateContent([prompt]);
-        const response = await result.response;
-        return response.text();
-      }
+      const lastMessage = dto.messageList[dto.messageList.length - 1];
+      dto.messageList.pop();
+      const chat = model.startChat({
+        history: dto.messageList,
+      });
+      const result = await chat.sendMessage(lastMessage.parts[0].text);
+      const response = await result.response;
+      return response.text();
+    } catch (e) {
+      throw new InternalServerErrorException('채팅 답변 오류', e.message)
+    }
+  }
+
+  async getRealtionQuestions(dto: MessageDto) {
+    try {
+      const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      const chat = model.startChat({
+        history: dto.messageList,
+      });
+      const result = await chat.sendMessage(`추천할만한 관련된 질문 3개를 알려줘. 답변 형태는 무조건 json array format으로 해주는데 배열 string만 답변해줘.
+        예를 들어 ['질문 1', '질문 2', '질문 3'] 이런 형태야.`);
+      const response = await result.response;
+      return response.text();
     } catch (e) {
       throw new InternalServerErrorException('채팅 답변 오류', e.message)
     }
