@@ -313,7 +313,7 @@ export class CorpService {
       const chat = model.startChat({
         history: dto.messageList,
       });
-      const result = await chat.sendMessage(`추천할만한 관련된 질문 3개를 알려주세요. 답변 형태는 무조건 json array format으로 해주는데 배열 string만 답변해주세요.
+      const result = await chat.sendMessage(`위 질문에서 주식, 증권, 종목 등과 관련된 추천할만한 관련된 질문 3개를 알려주세요. 답변 형태는 무조건 json array format으로 해주는데 배열 string만 답변해주세요.
         예를 들어 ['질문 1', '질문 2', '질문 3'] 이런 형태에요.`);
       const response = await result.response;
       return response.text();
