@@ -6,8 +6,9 @@
 - 기업의 재무와 주식 정보를 직관적이고 명료한 UI로 제공하는 서비스를 구축합니다.
 - 추천을 위해 다양한 관심사 또는 테마 별로 필터링을 하여 정보를 제공합니다.
 - AI를 활용하여 주식 시장 요약과 기업 별 성장성/안정성/수익성 등을 분석합니다.
+- AI에게 채팅으로 주식에 관련된 모든 것을 질문합니다.
 
-# 수집 방법
+# 종목 정보 수집 방법
 - 국내 상장 기업(코스피, 코스닥)은 한국거래소에서 제공하는 목록을 가져옵니다. (http://data.krx.co.kr/contents/MDC/MDI/mdiLoader/index.cmd?menuId=MDC0201020506)
     
     | 항목 | key |
@@ -47,10 +48,11 @@
     | 영업이익 연속증가 | continuousIncreaseOperatingProfit |
     | 배당 연속증가 | continuousincreaseDividends |
 
-# AI 활용
+# AI 기능 구현
 - Google Gemini API를 활용하여 Stock AI 기능을 구현합니다.
     - [https://ai.google.dev/gemini-api](https://ai.google.dev/gemini-api)
 - 구현 모델은 ‘gemini-1.5-pro’을 사용하며 코드 및 텍스트 생성, 텍스트 편집, 문제 해결, 데이터 추출 및 생성과 같은 복잡한 추론 작업이 가능합니다.
+- 프롬프트 엔지니어링을 통해 적절한 답변 응답
 
 # 구현 기술
 - 배포 및 호스팅: Docker, AWS ECS / Fargate / EC2 ubuntu 24.04
