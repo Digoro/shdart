@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, InternalServerErrorException, Param, Post, Put, Query, Res, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { CorpService } from './app.service';
@@ -57,5 +57,15 @@ export class AppController {
   @Get('/corp/:code')
   async getCorp(@Param('code') code: string): Promise<Corp> {
     return await this.corpService.getCorpByCode(code);
+  }
+
+  @Post('/chat')
+  async getAnswerMessage(@Body() data: any) {
+    try {
+      const answer = await this.corpService.getAnswerMessage(data);
+      return { answer }
+    } catch (e) {
+      throw new InternalServerErrorException('채팅 답변 오류', e.message)
+    }
   }
 }

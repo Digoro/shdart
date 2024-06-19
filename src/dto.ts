@@ -1,5 +1,5 @@
-import { Type } from "class-transformer";
-import { IsNumber, IsOptional } from "class-validator";
+import { Transform, Type } from "class-transformer";
+import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class PaginationSearchDto {
     @IsOptional()
@@ -63,4 +63,19 @@ export class CorpSearchDto extends PaginationSearchDto {
     @IsNumber()
     @Type(() => Number)
     continuousincreaseDividends: number;
+}
+
+export class MessageDto {
+    @IsArray()
+    @IsString({ each: true })
+    @Type(() => Array)
+    @Transform(value => {
+        return JSON.parse(value)
+    })
+    messageList: Message[];
+}
+
+export interface Message {
+    role: 'model' | 'user';
+    parts: { text: string }[];
 }
