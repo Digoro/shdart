@@ -3,8 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppGateway } from './app.gateway';
-import { CorpService } from './app.service';
-import { Corp, Finance } from './entity';
+import { AppService } from './app.service';
+import { Corp, Finance, StockPrice } from './entity';
+import { FinanceService } from './finance.service';
 import { HealthCheckController } from "./health-check.controller";
 
 @Module({
@@ -23,7 +24,8 @@ import { HealthCheckController } from "./health-check.controller";
     }),
     TypeOrmModule.forFeature([
       Corp,
-      Finance
+      Finance,
+      StockPrice
     ]),
     HttpModule
   ],
@@ -32,8 +34,9 @@ import { HealthCheckController } from "./health-check.controller";
     HealthCheckController
   ],
   providers: [
-    CorpService,
-    AppGateway
+    AppService,
+    AppGateway,
+    FinanceService,
   ],
 })
 export class AppModule { }

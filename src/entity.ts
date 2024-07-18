@@ -35,6 +35,9 @@ export class Corp extends BasicEntity {
 
     @OneToMany(() => Finance, entity => entity.corp)
     finances: Finance[];
+
+    @OneToMany(() => StockPrice, entity => entity.corp)
+    stockPrices: StockPrice[];
 }
 
 @Entity({ name: 'finance' })
@@ -108,4 +111,29 @@ export class Finance extends BasicEntity {
 
     @Column({ nullable: true, type: 'double', comment: '배당 연속증가' })
     continuousincreaseDividends: number;
+}
+
+@Entity({ name: 'stock_price' })
+export class StockPrice extends BasicEntity {
+    @ManyToOne(() => Corp, entity => entity.stockPrices)
+    @JoinColumn()
+    corp: Corp;
+
+    @Column({ nullable: true, type: 'timestamp', })
+    date: Date;
+
+    @Column({ nullable: true, type: 'double', comment: '시가' })
+    open: number;
+
+    @Column({ nullable: true, type: 'double', comment: '고가' })
+    high: number;
+
+    @Column({ nullable: true, type: 'double', comment: '저가' })
+    low: number;
+
+    @Column({ nullable: true, type: 'double', comment: '종가' })
+    close: number;
+
+    @Column({ nullable: true, type: 'double', comment: '거래량' })
+    volume: number;
 }

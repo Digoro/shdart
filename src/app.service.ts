@@ -1,16 +1,18 @@
+import { HttpService, Injectable, InternalServerErrorException } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Pagination, paginate } from 'nestjs-typeorm-paginate'
+import OpenAI from 'openai'
+import { Repository } from 'typeorm'
+import { CorpSearchDto, MessageDto, PaginationSearchDto } from './dto'
+import { Corp, Finance } from './entity'
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const xlsx = require('xlsx');
-import { HttpService, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Pagination, paginate } from 'nestjs-typeorm-paginate';
-import { Repository } from 'typeorm';
-import { CorpSearchDto, MessageDto, PaginationSearchDto } from './dto';
-import { Corp, Finance } from './entity';
-const JSZip = require('jszip')
 
 @Injectable()
-export class CorpService {
+export class AppService {
+  gemini: any;
+  openai: any;
 
   constructor(
     private config: ConfigService,
@@ -18,6 +20,8 @@ export class CorpService {
     @InjectRepository(Finance) private financeRepo: Repository<Finance>,
     private http: HttpService
   ) {
+    this.gemini = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY')).getGenerativeModel({ model: "gemini-1.5-flash" });
+    this.openai = new OpenAI({ apiKey: this.config.get("OPENAI_API_KEY") });
   }
 
   async addAllCorp() {
@@ -242,17 +246,21 @@ export class CorpService {
   }
 
   async summaryMarket() {
-    console.count('summaryMarket fun call!')
     try {
-      const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-      const prompts = [
-        `주식 초보에게 설명한다고 했을 때, 요즘 국내 주가 시장과 주요 업종 및 종목 이슈의 상황을 20줄 정도로 답변만 적어서 요약해주세요.
-      '응'이라고 말하지 말아주세요. 답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼주세요. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어주세요.`
-      ];
-      const prompt = prompts[Math.floor(Math.random() * (2 - 1 + 1))];
-      const result = await model.generateContentStream([prompt]);
+      console.count('summaryMarket fun call!')
+      const prompt = `주식 초보에게 설명한다고 했을 때, 요즘 국내 주가 시장과 주요 업종 및 종목 이슈의 상황을 20줄 정도로 답변만 적어서 요약해주세요.
+        '응'이라고 말하지 말아주세요. 답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼주세요.
+        답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어주세요.`;
+      const result = await this.gemini.generateContentStream([prompt]);
       return result;
+      // const prompt = `주식 초보에게 설명한다고 했을 때, 요즘 국내 주가 시장과 주요 업종 및 종목 이슈의 상황을 10줄 내로 요약해서 알려주세요. 
+      // '알겠습니다'와 같은 대답은 빼주고 답변 형식은 마크다운 형식으로 하이라이팅을 해주는데 '#', '##', '###', '####'과 같은 문법은 빼주세요. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어주세요.`
+      // const resFromGpt = await this.openai.chat.completions.create({
+      //   model: 'gpt-4o',
+      //   stream: true,
+      //   messages: [{ role: 'user', content: prompt }],
+      // });
+      // return resFromGpt;
     } catch (e) {
       console.log(e.message)
       throw new InternalServerErrorException('주식 시장 요약 오류', e.message)
@@ -263,8 +271,6 @@ export class CorpService {
     console.count('summaryMarket fun call!')
     try {
       const corp = await this.getCorpByName(corpName);
-      const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
       const prompt = `주식을 잘 모르는 초보에게 설명한다고 했을 때, 한국 상장 기업인 "${corpName}" 기업에 대해 짧게 소개해주고 재무 분석을 해서 답변만 적어서 요약해주세요.
       기업의 2021~2023년 재무재표는 다음과 같아요.
       ${JSON.stringify(corp.finances
@@ -276,7 +282,7 @@ export class CorpService {
         }))}
       기업의 재무재표 숫자를 기반으로 성장성, 안정성, 수익성을 나눠서 분석하여 요약해주고, 앞으로 투자할만한지도 알려주세요.
       답변 형식은 마크다운 문법 해주는데 '#', '##', '###', '####'과 같은 문법은 빼주세요. 답변은 구어체 존댓말로 해주고, 답변에 이모지도 2개 미만으로 섞어주세요.`
-      const result = await model.generateContentStream([prompt]);
+      const result = await this.gemini.generateContentStream(prompt);
       return result;
     } catch (e) {
       console.log(e.message)
@@ -286,8 +292,6 @@ export class CorpService {
 
   async getAnswerMessage(dto: MessageDto) {
     try {
-      const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
       dto.messageList.unshift({
         role: 'user', parts: [{
           text: `앞으로 질문은 주식, 증권, 종목 등과 관련된 내용만 답변해야해요. 주식을 잘 모르는 초보에게 설명한다고 한다고 생각해주세요.
@@ -295,7 +299,7 @@ export class CorpService {
       })
       const lastMessage = dto.messageList[dto.messageList.length - 1];
       dto.messageList.pop();
-      const chat = model.startChat({
+      const chat = this.gemini.startChat({
         history: dto.messageList,
       });
       const result = await chat.sendMessage(lastMessage.parts[0].text);
@@ -306,17 +310,45 @@ export class CorpService {
     }
   }
 
+  async getWelcomeQuestions() {
+    try {
+      const prompt = `주식 AI 채팅 기능이에요. 주식 초보를 대상으로 국내 주요 종목 이슈, 주식 시장 이슈와 관련된 1줄 이하 질문 3개를 알려주세요.
+      답변 형태는 무조건 json array format으로 해주는데 배열 string만 답변해주세요. 답변은 구어체 존댓말로 해주세요.
+      예를 들어 ["질문 1", "질문 2", "질문 3"] 이런 형태에요.`
+      const result = await this.gemini.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      return text;
+    } catch (e) {
+      throw new InternalServerErrorException('웰컴 질문 오류', e.message)
+    }
+  }
+
   async getRealtionQuestions(dto: MessageDto) {
     try {
-      const genAI = new GoogleGenerativeAI(this.config.get('GEMINI_API_KEY'));
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-      const chat = model.startChat({
+      const chat = this.gemini.startChat({
         history: dto.messageList,
       });
       const result = await chat.sendMessage(`위 질문에서 주식, 증권, 종목 등과 관련된 추천할만한 관련된 질문 3개를 알려주세요. 답변 형태는 무조건 json array format으로 해주는데 배열 string만 답변해주세요.
-        예를 들어 ['질문 1', '질문 2', '질문 3'] 이런 형태에요.`);
+        예를 들어 ["질문 1", "질문 2", "질문 3"] 이런 형태에요.`);
       const response = await result.response;
       return response.text();
+      // const resFromGpt = await this.openai.chat.completions.create({
+      //   model: 'gpt-3.5-turbo',
+      //   messages: [
+      //     ...dto.messageList.map(v => {
+      //       return {
+      //         role: v.role == 'model' ? 'system' : 'user',
+      //         content: v.parts[0].text
+      //       }
+      //     }),
+      //     {
+      //       role: 'user',
+      //       content: `위 질문에서 주식, 증권, 종목 등과 관련된 추천할만한 관련된 질문 3개를 알려주세요. 답변 형태는 무조건 json array format으로 해주는데 배열 string만 답변해주세요. 
+      //       예를 들어 ["질문 1", "질문 2", "질문 3"] 이런 형태에요.`,
+      //     }],
+      // });
+      // return resFromGpt.choices[0].message.content;
     } catch (e) {
       throw new InternalServerErrorException('채팅 답변 오류', e.message)
     }

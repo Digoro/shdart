@@ -65,6 +65,11 @@ export class CorpSearchDto extends PaginationSearchDto {
     continuousincreaseDividends: number;
 }
 
+export class StockPriceSearchDto extends PaginationSearchDto {
+    @IsString()
+    code: string;
+}
+
 export class MessageDto {
     @IsArray()
     @IsString({ each: true })

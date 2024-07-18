@@ -1,13 +1,13 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { CorpService } from './app.service';
+import { AppService } from './app.service';
 
 @WebSocketGateway({ namespace: 'shWebsocket' })
 export class AppGateway {
   @WebSocketServer() server;
 
   constructor(
-    private corpService: CorpService,
+    private corpService: AppService,
   ) { }
 
   @SubscribeMessage('getSummaryMarket')
