@@ -66,6 +66,10 @@ export class CorpSearchDto extends PaginationSearchDto {
 }
 
 export class StockPriceSearchDto extends PaginationSearchDto {
+    @IsOptional()
+    @IsString()
+    period1: string;
+
     @IsString()
     code: string;
 }

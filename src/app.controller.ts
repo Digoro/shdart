@@ -62,6 +62,7 @@ export class AppController {
 
   @Post('/search/stock_price')
   async searchStockPrice(@Body() dto: StockPriceSearchDto): Promise<Pagination<StockPrice>> {
+    dto.period1 = '2022-01-01';
     return await this.financeSerivce.searchStockPrice(dto);
   }
 
